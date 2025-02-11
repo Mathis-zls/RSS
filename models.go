@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedAt time.Time `json:"created"`
-	UpdatedAt time.Time `json:"lastupdate`
+	UpdatedAt time.Time `json:"lastupdate"`
 	Name      string    `json:"name"`
 }
 
