@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -50,7 +51,7 @@ func scrapFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 			description.Valid = true
 		}
 
-		pubtime, err := time.Parse(time.RFC1123, item.PubDate)
+		pubtime, err := dateParser(item.PubDate)
 
 		if err != nil {
 			log.Println("Error Parsing time:", err)
@@ -74,4 +75,24 @@ func scrapFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 		}
 	}
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
+}
+
+var dateFormats = []string{
+	time.RFC1123,
+	time.RFC1123Z,
+	time.RFC3339,
+	time.DateOnly,
+	time.RFC3339Nano,
+	time.RFC822,
+	time.RFC850,
+}
+
+func dateParser(date string) (time.Time, error) {
+	for _, format := range dateFormats {
+		if time, err := time.Parse(format, date); err == nil {
+			return time, nil
+		}
+	}
+	var defaul time.Time
+	return defaul, errors.New("not supported Time format")
 }
