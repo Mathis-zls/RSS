@@ -77,3 +77,39 @@ func databaseFeedFollowsToFeedFollow(db []database.FeedFollow) []FeedFollow {
 	}
 	return feedfollows
 }
+
+type Posts struct {
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Title       string    `json:"title"`
+	Description *string   `json:"description"`
+	PublishedAt time.Time `json:"published_at"`
+	Url         string    `json:"url"`
+	FeedID      uuid.UUID `json:"feed_id"`
+}
+
+func databasePostToPost(db database.Post) Posts {
+	var desc *string
+	if db.Description.Valid {
+		desc = &db.Description.String
+	}
+	return Posts{
+		ID:          db.ID,
+		CreatedAt:   db.CreatedAt,
+		UpdatedAt:   db.UpdatedAt,
+		Title:       db.Title,
+		Description: desc,
+		PublishedAt: db.PublishedAt,
+		Url:         db.Url,
+		FeedID:      db.FeedID,
+	}
+
+}
+func databasePostsToPosts(db []database.Post) []Posts {
+	posts := []Posts{}
+	for _, post := range db {
+		posts = append(posts, databasePostToPost(post))
+	}
+	return posts
+}
